@@ -1,4 +1,4 @@
-import ErrorResponse from "../utils/error-model.js";
+import ErrorResponse from "../utils/errorResponse.js";
 import StatusCodes from "../utils/repsonseCode.js";
 
 const validateRequest = (schema, source = "body") => {

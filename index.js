@@ -4,14 +4,34 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-
+import cors from "cors";
 import { connectDB, disconnectDB } from "./utils/dbConnection.js";
 import errorHandler from "./middlewares/errorHandler.js";
-
+import authRoute from "./auth/auth.route.js";
 dotenv.config();
 
 const app = express();
-
+// --- CORS ---
+const allowedOrigins = [
+  "http://localhost:4200",
+  "http://localhost:5173",
+  "http://localhost:3001",
+  "http://localhost:3000",
+  process.env.CLIENT_URL,
+  process.env.ADMIN_URL,
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 // --- Middlewares ---
 app.use(express.json());
 app.use(cookieParser());
@@ -29,15 +49,12 @@ app.use(
 
 // --- Connect to MongoDB ---
 connectDB();
-
+// --- Routes ---
+app.use("/api/auth", authRoute);
 // --- Example Route ---
 app.get("/", (req, res) => {
   res.json({ success: true, message: "🎬 IMDb Clone API is running 🚀" });
 });
-
-// --- TODO: Add your routes here ---
-// app.use("/api/users", userRoutes);
-// app.use("/api/entities", entityRoutes);
 
 // --- Error Middleware (must be last) ---
 app.use(errorHandler);
