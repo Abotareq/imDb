@@ -1,0 +1,1 @@
+please use for more details http://localhost:5000/api-docs/
