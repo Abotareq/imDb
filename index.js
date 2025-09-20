@@ -10,6 +10,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import { setupSwagger } from "./docs/swagger.js";
 import authRoute from "./auth/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import entityRoute from "./routes/entity.route.js";
 dotenv.config();
 
 const app = express();
@@ -55,6 +56,7 @@ connectDB();
 // --- Routes ---
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/entities", entityRoute);
 // --- Example Route ---
 app.get("/", (req, res) => {
   res.json({ success: true, message: "🎬 IMDb Clone API is running 🚀" });
