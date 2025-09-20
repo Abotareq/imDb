@@ -10,6 +10,20 @@ const options = {
       description: "API documentation for our IMDb-like app",
     },
     servers: [{ url: "http://localhost:5000/api" }],
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "access_token", // 👈 name of your JWT cookie
+        },
+      },
+    },
+    security: [
+      {
+        cookieAuth: [],
+      },
+    ],
   },
   apis: ["./routes/*.js", "./models/*.js", "./auth/*.js"], // paths to files with JSDoc comments
 };

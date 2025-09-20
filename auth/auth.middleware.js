@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import StatusCodes from "../utils/responseCode.js";
+import StatusCodes from "../utils/repsonseCode.js";
 import ErrorResponse from "../utils/errorResponse.js";
 
 export const requireAuth = async (req, res, next) => {

@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
 
     role: { type: String, enum: ["user", "admin"], default: "user" },
 
+    avatar: { type: String, default: "" },
+    bio: { type: String, maxlength: 300 },
+    verified: { type: Boolean, default: false },
+
     watchlist: [watchlistSchema],
   },
   {
@@ -29,10 +33,12 @@ const userSchema = new mongoose.Schema(
     },
   }
 );
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
 export default mongoose.model("User", userSchema);
