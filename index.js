@@ -7,10 +7,12 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 import { connectDB, disconnectDB } from "./utils/dbConnection.js";
 import errorHandler from "./middlewares/errorHandler.js";
+import { setupSwagger } from "./docs/swagger.js";
 import authRoute from "./auth/auth.route.js";
 dotenv.config();
 
 const app = express();
+setupSwagger(app);
 // --- CORS ---
 const allowedOrigins = [
   "http://localhost:4200",
