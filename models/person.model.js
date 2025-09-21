@@ -6,9 +6,8 @@ const personSchema = new mongoose.Schema({
   dateOfBirth: Date,
   photoUrl: String,
 
-  roles: [{ type: String, enum: ["actor", "director", "writer"] }],
+  roles: [{ type: String, enum: ["actor", "director"] }],
 
-  entities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Entity" }]
 }, { timestamps: true });
 
 export default mongoose.model("Person", personSchema);
