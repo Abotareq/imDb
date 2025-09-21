@@ -673,3 +673,436 @@ export default router;
  *           description: Total number of pages
  *           example: 10
  */
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Character:
+ *       type: object
+ *       required:
+ *         - name
+ *         - actor
+ *         - entity
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated id of the character
+ *           example: "650a8b3f4f1234567890abcd"
+ *         name:
+ *           type: string
+ *           description: Character's name
+ *           example: "Bruce Wayne"
+ *         description:
+ *           type: string
+ *           description: Character description
+ *           example: "A billionaire vigilante who fights crime as Batman"
+ *         actor:
+ *           type: object
+ *           description: The actor who plays this character
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abcd"
+ *             name:
+ *               type: string
+ *               example: "Christian Bale"
+ *             photoUrl:
+ *               type: string
+ *               example: "https://example.com/christian-bale.jpg"
+ *             roles:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["actor"]
+ *         entity:
+ *           type: object
+ *           description: The movie/TV show this character appears in
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abce"
+ *             title:
+ *               type: string
+ *               example: "Batman Begins"
+ *             type:
+ *               type: string
+ *               example: "movie"
+ *             posterUrl:
+ *               type: string
+ *               example: "https://example.com/batman-begins-poster.jpg"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           readOnly: true
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           readOnly: true
+ *       example:
+ *         _id: "650a8b3f4f1234567890abcd"
+ *         name: "Bruce Wayne"
+ *         description: "A billionaire vigilante who fights crime as Batman"
+ *         actor:
+ *           _id: "650a8b3f4f1234567890abcd"
+ *           name: "Christian Bale"
+ *           photoUrl: "https://example.com/christian-bale.jpg"
+ *           roles: ["actor"]
+ *         entity:
+ *           _id: "650a8b3f4f1234567890abce"
+ *           title: "Batman Begins"
+ *           type: "movie"
+ *           posterUrl: "https://example.com/batman-begins-poster.jpg"
+ *         createdAt: "2023-09-20T10:30:00.000Z"
+ *         updatedAt: "2023-09-20T10:30:00.000Z"
+ *
+ *     CharacterDetailed:
+ *       type: object
+ *       description: Character with full actor and entity details
+ *       properties:
+ *         _id:
+ *           type: string
+ *           example: "650a8b3f4f1234567890abcd"
+ *         name:
+ *           type: string
+ *           example: "Bruce Wayne"
+ *         description:
+ *           type: string
+ *           example: "A billionaire vigilante who fights crime as Batman"
+ *         actor:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abcd"
+ *             name:
+ *               type: string
+ *               example: "Christian Bale"
+ *             bio:
+ *               type: string
+ *               example: "Welsh actor known for intense method acting"
+ *             photoUrl:
+ *               type: string
+ *               example: "https://example.com/christian-bale.jpg"
+ *             dateOfBirth:
+ *               type: string
+ *               format: date
+ *               example: "1974-01-30"
+ *             roles:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["actor"]
+ *         entity:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abce"
+ *             title:
+ *               type: string
+ *               example: "Batman Begins"
+ *             type:
+ *               type: string
+ *               example: "movie"
+ *             description:
+ *               type: string
+ *               example: "After training with his mentor, Batman begins his fight to free crime-ridden Gotham City"
+ *             posterUrl:
+ *               type: string
+ *               example: "https://example.com/batman-begins-poster.jpg"
+ *             coverUrl:
+ *               type: string
+ *               example: "https://example.com/batman-begins-cover.jpg"
+ *             rating:
+ *               type: number
+ *               example: 8.2
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-09-20T10:30:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2023-09-20T10:30:00.000Z"
+ *
+ *     CreateCharacter:
+ *       type: object
+ *       required:
+ *         - name
+ *         - actor
+ *         - entity
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           description: Character's name
+ *           example: "Bruce Wayne"
+ *         description:
+ *           type: string
+ *           maxLength: 1000
+ *           description: Character description
+ *           example: "A billionaire vigilante who fights crime as Batman"
+ *         actor:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *           description: Actor's ObjectId
+ *           example: "650a8b3f4f1234567890abcd"
+ *         entity:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *           description: Entity's ObjectId
+ *           example: "650a8b3f4f1234567890abce"
+ *
+ *     UpdateCharacter:
+ *       type: object
+ *       minProperties: 1
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           description: Character's name
+ *           example: "Bruce Wayne / Batman"
+ *         description:
+ *           type: string
+ *           maxLength: 1000
+ *           description: Character description
+ *           example: "A billionaire vigilante who fights crime as Batman in Gotham City"
+ *         actor:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *           description: New actor's ObjectId
+ *           example: "650a8b3f4f1234567890abcd"
+ *         entity:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *           description: New entity's ObjectId
+ *           example: "650a8b3f4f1234567890abce"
+ *
+ *     CreateMultipleCharacters:
+ *       type: object
+ *       required:
+ *         - characters
+ *       properties:
+ *         characters:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/CreateCharacter'
+ *           minItems: 1
+ *           maxItems: 50
+ *           description: Array of characters to create
+ *           example:
+ *             - name: "Bruce Wayne"
+ *               description: "Batman"
+ *               actor: "650a8b3f4f1234567890abcd"
+ *               entity: "650a8b3f4f1234567890abce"
+ *             - name: "Alfred Pennyworth"
+ *               description: "Wayne family butler"
+ *               actor: "650a8b3f4f1234567890abcf"
+ *               entity: "650a8b3f4f1234567890abce"
+ *
+ *     CharacterList:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         characters:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Character'
+ *         pagination:
+ *           $ref: '#/components/schemas/Pagination'
+ *
+ *     CharactersByEntity:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         entity:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abce"
+ *             title:
+ *               type: string
+ *               example: "Batman Begins"
+ *             type:
+ *               type: string
+ *               example: "movie"
+ *         characters:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Character'
+ *         pagination:
+ *           $ref: '#/components/schemas/Pagination'
+ *
+ *     CharactersByActor:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         actor:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abcd"
+ *             name:
+ *               type: string
+ *               example: "Christian Bale"
+ *             photoUrl:
+ *               type: string
+ *               example: "https://example.com/christian-bale.jpg"
+ *         characters:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               entity:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   type:
+ *                     type: string
+ *                   posterUrl:
+ *                     type: string
+ *                   releaseDate:
+ *                     type: string
+ *                     format: date
+ *               createdAt:
+ *                 type: string
+ *                 format: date-time
+ *         pagination:
+ *           $ref: '#/components/schemas/Pagination'
+ *
+ *     CharacterResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: "Character created successfully"
+ *         character:
+ *           $ref: '#/components/schemas/Character'
+ *
+ *     CharacterDetailedResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         character:
+ *           $ref: '#/components/schemas/CharacterDetailed'
+ *
+ *     BulkCharacterResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: "5 characters created successfully"
+ *         characters:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Character'
+ *
+ *     DeleteCharacterResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: "Character deleted successfully"
+ *         deletedCharacter:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abcd"
+ *             name:
+ *               type: string
+ *               example: "Bruce Wayne"
+ *             actor:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abcd"
+ *             entity:
+ *               type: string
+ *               example: "650a8b3f4f1234567890abce"
+ *
+ *     BulkDeleteResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         message:
+ *           type: string
+ *           example: "5 characters deleted successfully"
+ *         deletedCount:
+ *           type: integer
+ *           example: 5
+ *
+ *     Pagination:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: integer
+ *           description: Total number of items
+ *           example: 100
+ *         page:
+ *           type: integer
+ *           description: Current page number
+ *           example: 1
+ *         limit:
+ *           type: integer
+ *           description: Items per page
+ *           example: 10
+ *         pages:
+ *           type: integer
+ *           description: Total number of pages
+ *           example: 10
+ *
+ *     Error:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         message:
+ *           type: string
+ *           example: "Error message"
+ *         error:
+ *           type: string
+ *           example: "Detailed error information"
+ *         errors:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               field:
+ *                 type: string
+ *                 example: "name"
+ *               message:
+ *                 type: string
+ *                 example: "Name is required"
+ */
