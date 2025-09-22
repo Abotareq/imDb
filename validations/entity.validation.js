@@ -1,5 +1,4 @@
 import Joi from "joi";
-// validations/entity.validation.js
 const entityBase = {
   title: Joi.string().required(),
   description: Joi.string().allow("").optional(),

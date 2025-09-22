@@ -1,4 +1,3 @@
-// validations/character.validation.js
 import Joi from "joi";
 
 export const characterValidation = {

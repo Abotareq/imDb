@@ -1,4 +1,3 @@
-// middlewares/validateFormData.js
 import Joi from "joi";
 
 const validateFormData = (schema) => {

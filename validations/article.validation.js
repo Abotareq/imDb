@@ -1,4 +1,3 @@
-// validations/article.validation.js
 import Joi from "joi";
 
 export const articleValidation = {
