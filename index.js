@@ -13,6 +13,7 @@ import userRoute from "./routes/user.route.js";
 import entityRoute from "./routes/entity.route.js";
 import personRoute from "./routes/person.route.js";
 import characterRoute from "./routes/character.route.js";
+import articleRoute from "./routes/article.route.js";
 dotenv.config();
 
 const app = express();
@@ -61,6 +62,7 @@ app.use("/api/users", userRoute);
 app.use("/api/entities", entityRoute);
 app.use("/api/people", personRoute);
 app.use("/api/characters", characterRoute);
+app.use("/api/articles", articleRoute);
 // --- Example Route ---
 app.get("/", (req, res) => {
   res.json({ success: true, message: "🎬 IMDb Clone API is running 🚀" });
