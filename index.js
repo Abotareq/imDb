@@ -16,6 +16,9 @@ import characterRoute from "./routes/character.route.js";
 import articleRoute from "./routes/article.route.js";
 import awardRoute from "./routes/award.route.js";
 import reviewRoute from "./routes/review.route.js";
+import recommendationsRoute from "./routes/recommendation.routes.js";
+import { startAutoVerificationCron } from "./jobs/auto.verification.js";
+import { verifyEmailConfig } from "./utils/email.js";
 dotenv.config();
 
 const app = express();
@@ -67,11 +70,29 @@ app.use("/api/characters", characterRoute);
 app.use("/api/articles", articleRoute);
 app.use("/api/awards", awardRoute);
 app.use("/api/reviews", reviewRoute);
+app.use("/api/recommendations", recommendationsRoute);
 // --- Example Route ---
 app.get("/", (req, res) => {
   res.json({ success: true, message: "🎬 IMDb Clone API is running 🚀" });
 });
+// --- Start Cron Jobs ---
+if (process.env.ENABLE_CRON === 'true') {
+  startAutoVerificationCron();
+}
+else {
+  console.log('Cron jobs are disabled. Set ENABLE_CRON=true to enable.');
+}
 
+// --- Email Setup ---
+verifyEmailConfig().then((success) => {
+  if (success) {
+    console.log('SMTP connection verified successfully');
+  } else {
+    console.log('SMTP connection failed');
+  }
+}).catch((error) => {
+  console.error('SMTP verification error:', error.message);
+});
 // --- Error Middleware (must be last) ---
 app.use(errorHandler);
 

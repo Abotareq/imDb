@@ -19,8 +19,19 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String, default: "" },
     bio: { type: String, maxlength: 300 },
     verified: { type: Boolean, default: false },
-
+    verifiedAt: {
+      type: Date,
+    },
+    verificationNote: {
+      type: String,
+      maxlength: 200,
+    },
     watchlist: [watchlistSchema],
+    preferences: {
+      type: Map,
+      of: Number, // Store preference scores (e.g., genre: 0.8 or type: 0.9)
+      default: {},
+    },
   },
   {
     timestamps: true,

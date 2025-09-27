@@ -1,3 +1,4 @@
+// controllers/auth.controller.js
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import ErrorResponse from "../utils/errorResponse.js";
@@ -15,7 +16,7 @@ const setAuthCookie = (res, token) => {
 
 export const signup = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body; // already validated
+    const { username, email, password, preferences = {} } = req.body; // Accept optional preferences
 
     const exists = await User.findOne({ email });
     if (exists)
@@ -23,12 +24,11 @@ export const signup = async (req, res, next) => {
         new ErrorResponse("Email already registered", StatusCodes.BAD_REQUEST)
       );
 
-   
-
     const user = await User.create({
       username,
       email,
-      password
+      password,
+      preferences, 
     });
 
     const token = generateToken(user._id);
@@ -39,7 +39,7 @@ export const signup = async (req, res, next) => {
       message: "Signup successful",
       user: {
         id: user._id,
-        name: user.name,
+        name: user.username,
         email: user.email,
       },
     });
@@ -51,7 +51,7 @@ export const signup = async (req, res, next) => {
 // @desc    Signin
 export const signin = async (req, res, next) => {
   try {
-    const { email, password } = req.body; // already validated
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email });
     if (!user)
@@ -64,7 +64,7 @@ export const signin = async (req, res, next) => {
       return next(
         new ErrorResponse("Invalid credentials", StatusCodes.UNAUTHORIZED)
       );
-  
+
     const token = generateToken(user._id);
     setAuthCookie(res, token);
 
@@ -73,7 +73,7 @@ export const signin = async (req, res, next) => {
       message: "Signin successful",
       user: {
         id: user._id,
-        name: user.name,
+        name: user.username,
         email: user.email,
       },
     });
@@ -98,7 +98,6 @@ export const getStatus = (req, res, next) => {
       );
     }
 
-    // Verify the token
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       res.status(200).json({
@@ -108,9 +107,7 @@ export const getStatus = (req, res, next) => {
         message: "User is authenticated",
       });
     } catch (jwtError) {
-      return next(
-        new ErrorResponse("Invalid token", StatusCodes.UNAUTHORIZED)
-      );
+      return next(new ErrorResponse("Invalid token", StatusCodes.UNAUTHORIZED));
     }
   } catch (error) {
     return next(
