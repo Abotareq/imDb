@@ -115,6 +115,77 @@ export const createEntity = async (req, res, next) => {
   }
 };
 
+export const createEntityTv = async (req, res, next) => {
+  try {
+    const data = req.body;
+
+    // Parse JSON fields (validateFormData middleware may already handle this)
+    if (typeof data.genres === "string") data.genres = JSON.parse(data.genres);
+    if (typeof data.directors === "string") data.directors = JSON.parse(data.directors);
+    if (typeof data.cast === "string") data.cast = JSON.parse(data.cast);
+    if (typeof data.seasons === "string") data.seasons = JSON.parse(data.seasons);
+
+    // Handle file uploads for series-level poster and cover
+    if (req.files) {
+      req.files.forEach((file) => {
+        if (file.fieldname === "posterUrl") {
+          data.posterUrl = file.path;
+        }
+        if (file.fieldname === "coverUrl") {
+          data.coverUrl = file.path;
+        }
+      });
+    }
+
+    // Handle dynamic file uploads for seasons and episodes
+    if (data.seasons && req.files) {
+      data.seasons = data.seasons.map((season, seasonIndex) => {
+        const seasonNumber = season.seasonNumber;
+
+        // Map season-level poster and cover
+        req.files.forEach((file) => {
+          if (file.fieldname === `season${seasonNumber}_poster`) {
+            season.posterUrl = file.path;
+          }
+          if (file.fieldname === `season${seasonNumber}_cover`) {
+            season.coverUrl = file.path;
+          }
+        });
+
+        // Map episode-level thumbnails
+        if (season.episodes) {
+          season.episodes = season.episodes.map((episode, episodeIndex) => {
+            const episodeNumber = episode.episodeNumber;
+            req.files.forEach((file) => {
+              if (file.fieldname === `season${seasonNumber}_episode${episodeNumber}_thumbnail`) {
+                episode.thumbnailUrl = file.path;
+              }
+            });
+            return episode;
+          });
+        }
+
+        return season;
+      });
+    }
+
+    // Create the new entity
+    const newEntity = await Entity.create(data);
+
+    // Populate the created entity for response
+    const populatedEntity = await Entity.findById(newEntity._id)
+      .populate("directors cast", "name")
+      .lean();
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: `${newEntity.type} created successfully`,
+      entity: populatedEntity,
+    });
+  } catch (err) {
+    next(new ErrorResponse(err.message, StatusCodes.BAD_REQUEST));
+  }
+};
 /* ---------------------- UPDATE ---------------------- */
 export const updateEntity = async (req, res, next) => {
   try {
@@ -127,29 +198,64 @@ export const updateEntity = async (req, res, next) => {
 
     const data = req.body;
 
-    // Attach poster & cover if uploaded
-    if (req.files?.posterUrl) {
-      data.posterUrl = req.files.posterUrl[0].path;
-    }
-    if (req.files?.coverUrl) {
-      data.coverUrl = req.files.coverUrl[0].path;
-    }
-
-    // validateFormData middleware handles JSON parsing, but keep as fallback
+    // Parse JSON fields (validateFormData middleware may already handle this)
     if (typeof data.genres === "string") data.genres = JSON.parse(data.genres);
-    if (typeof data.directors === "string")
-      data.directors = JSON.parse(data.directors);
+    if (typeof data.directors === "string") data.directors = JSON.parse(data.directors);
     if (typeof data.cast === "string") data.cast = JSON.parse(data.cast);
-    if (typeof data.seasons === "string")
-      data.seasons = JSON.parse(data.seasons);
+    if (typeof data.seasons === "string") data.seasons = JSON.parse(data.seasons);
 
-    // Remove undefined values to avoid overwriting with undefined
+    // Handle file uploads for series-level poster and cover
+    if (req.files) {
+      req.files.forEach((file) => {
+        if (file.fieldname === "posterUrl") {
+          data.posterUrl = file.path;
+        }
+        if (file.fieldname === "coverUrl") {
+          data.coverUrl = file.path;
+        }
+      });
+    }
+
+    // Handle dynamic file uploads for seasons and episodes
+    if (data.seasons && req.files) {
+      data.seasons = data.seasons.map((season, seasonIndex) => {
+        const seasonNumber = season.seasonNumber;
+
+        // Map season-level poster and cover
+        req.files.forEach((file) => {
+          if (file.fieldname === `season${seasonNumber}_poster`) {
+            season.posterUrl = file.path;
+          }
+          if (file.fieldname === `season${seasonNumber}_cover`) {
+            season.coverUrl = file.path;
+          }
+        });
+
+        // Map episode-level thumbnails
+        if (season.episodes) {
+          season.episodes = season.episodes.map((episode, episodeIndex) => {
+            const episodeNumber = episode.episodeNumber;
+            req.files.forEach((file) => {
+              if (file.fieldname === `season${seasonNumber}_episode${episodeNumber}_thumbnail`) {
+                episode.thumbnailUrl = file.path;
+              }
+            });
+            return episode;
+          });
+        }
+
+        return season;
+      });
+    }
+
+    // Remove undefined or empty string values to avoid overwriting with undefined
     Object.keys(data).forEach((key) => {
       if (data[key] === undefined || data[key] === "") {
         delete data[key];
       }
     });
 
+    // Update the entity
     const updatedEntity = await Entity.findByIdAndUpdate(
       req.params.id,
       { $set: data },
@@ -170,10 +276,9 @@ export const updateEntity = async (req, res, next) => {
       entity: updatedEntity,
     });
   } catch (err) {
-    next(err);
+    next(new ErrorResponse(err.message, StatusCodes.BAD_REQUEST));
   }
 };
-
 /* ---------------------- DELETE ---------------------- */
 export const deleteEntity = async (req, res, next) => {
   try {
