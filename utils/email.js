@@ -10,9 +10,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-/*   tls: {
+  tls: {
     rejectUnauthorized: false, 
-  }, */
+  },
 });
 
 // Function to replace template placeholders with actual data
