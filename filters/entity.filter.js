@@ -1,4 +1,5 @@
 /* ---------------------- FILTER MOVIES ---------------------- */
+import Entity from "../models/entity.model.js";
 export const filterMovies = async (req, res, next) => {
   try {
     const { genre, year, minRating, maxRating } = req.query;
@@ -22,7 +23,7 @@ export const filterMovies = async (req, res, next) => {
       if (maxRating) filter.rating.$lte = Number(maxRating);
     }
 
-    const movies = await Entity.find(filter).populate("directors cast").lean();
+    const movies = await Entity.find(filter).lean();
 
     res.json({ success: true, count: movies.length, movies });
   } catch (err) {
