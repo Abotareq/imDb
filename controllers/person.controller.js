@@ -9,18 +9,18 @@ export const getAllPeople = async (req, res, next) => {
   try {
     const { role, page = 1, limit = 10, search } = req.query;
     const filter = {};
-    
+
     // Filter by role (actor, director, writer)
     if (role) filter.roles = role;
-    
+
     // Search by name
     if (search) {
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { bio: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { bio: { $regex: search, $options: "i" } },
       ];
     }
-    
+
     const skip = (page - 1) * limit;
     const people = await Person.find(filter)
       .limit(Number(limit))
@@ -30,15 +30,15 @@ export const getAllPeople = async (req, res, next) => {
 
     const total = await Person.countDocuments(filter);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       people,
       pagination: {
         total,
         page: Number(page),
         limit: Number(limit),
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
     next(err);
@@ -49,7 +49,9 @@ export const getPersonById = async (req, res, next) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      return next(new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST)
+      );
     }
 
     const person = await Person.findById(req.params.id).lean();
@@ -71,7 +73,9 @@ export const getPersonEntities = async (req, res, next) => {
 
     // Validate ObjectId format
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return next(new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST)
+      );
     }
 
     // Check if person exists
@@ -85,22 +89,22 @@ export const getPersonEntities = async (req, res, next) => {
     // Find entities where person is director or cast
     const [asDirector, asCast] = await Promise.all([
       Entity.find({ directors: id })
-        .select('title type posterUrl releaseDate rating')
+        .select("title type posterUrl releaseDate rating")
         .limit(Number(limit))
         .skip(skip)
         .sort({ releaseDate: -1 })
         .lean(),
       Entity.find({ cast: id })
-        .select('title type posterUrl releaseDate rating')
+        .select("title type posterUrl releaseDate rating")
         .limit(Number(limit))
         .skip(skip)
         .sort({ releaseDate: -1 })
-        .lean()
+        .lean(),
     ]);
 
     const [directorCount, castCount] = await Promise.all([
       Entity.countDocuments({ directors: id }),
-      Entity.countDocuments({ cast: id })
+      Entity.countDocuments({ cast: id }),
     ]);
 
     res.json({
@@ -108,7 +112,7 @@ export const getPersonEntities = async (req, res, next) => {
       person: {
         _id: person._id,
         name: person.name,
-        photoUrl: person.photoUrl
+        photoUrl: person.photoUrl,
       },
       movies: {
         asDirector: {
@@ -117,8 +121,8 @@ export const getPersonEntities = async (req, res, next) => {
           pagination: {
             page: Number(page),
             limit: Number(limit),
-            pages: Math.ceil(directorCount / limit)
-          }
+            pages: Math.ceil(directorCount / limit),
+          },
         },
         asCast: {
           items: asCast,
@@ -126,10 +130,10 @@ export const getPersonEntities = async (req, res, next) => {
           pagination: {
             page: Number(page),
             limit: Number(limit),
-            pages: Math.ceil(castCount / limit)
-          }
-        }
-      }
+            pages: Math.ceil(castCount / limit),
+          },
+        },
+      },
     });
   } catch (err) {
     next(err);
@@ -142,14 +146,19 @@ export const getPersonsByRole = async (req, res, next) => {
     const { page = 1, limit = 10 } = req.query;
 
     // Validate role
-    const validRoles = ['actor', 'director', 'writer'];
+    const validRoles = ["actor", "director", "writer"];
     if (!validRoles.includes(role)) {
-      return next(new ErrorResponse("Invalid role. Must be: actor, director, or writer", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse(
+          "Invalid role. Must be: actor, director, or writer",
+          StatusCodes.BAD_REQUEST
+        )
+      );
     }
 
     const skip = (page - 1) * limit;
     const people = await Person.find({ roles: role })
-      .select('name photoUrl dateOfBirth roles')
+      .select("name photoUrl dateOfBirth roles")
       .limit(Number(limit))
       .skip(skip)
       .sort({ name: 1 })
@@ -165,8 +174,8 @@ export const getPersonsByRole = async (req, res, next) => {
         total,
         page: Number(page),
         limit: Number(limit),
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
     next(err);
@@ -210,7 +219,9 @@ export const updatePerson = async (req, res, next) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      return next(new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST)
+      );
     }
 
     const data = req.body;
@@ -231,8 +242,8 @@ export const updatePerson = async (req, res, next) => {
     }
 
     // Remove undefined values to avoid overwriting with undefined
-    Object.keys(data).forEach(key => {
-      if (data[key] === undefined || data[key] === '') {
+    Object.keys(data).forEach((key) => {
+      if (data[key] === undefined || data[key] === "") {
         delete data[key];
       }
     });
@@ -266,7 +277,9 @@ export const deletePerson = async (req, res, next) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      return next(new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST)
+      );
     }
 
     const deleted = await Person.findByIdAndDelete(req.params.id);
@@ -277,22 +290,22 @@ export const deletePerson = async (req, res, next) => {
     // Remove person from all entities (optional - you might want to keep the references)
     await Entity.updateMany(
       { $or: [{ directors: req.params.id }, { cast: req.params.id }] },
-      { 
-        $pull: { 
+      {
+        $pull: {
           directors: req.params.id,
-          cast: req.params.id 
-        }
+          cast: req.params.id,
+        },
       }
     );
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "Person deleted successfully",
       deletedPerson: {
         id: deleted._id,
         name: deleted.name,
-        roles: deleted.roles
-      }
+        roles: deleted.roles,
+      },
     });
   } catch (err) {
     next(err);
@@ -306,7 +319,9 @@ export const getPersonStats = async (req, res, next) => {
 
     // Validate ObjectId format
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return next(new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST));
+      return next(
+        new ErrorResponse("Invalid person ID format", StatusCodes.BAD_REQUEST)
+      );
     }
 
     const person = await Person.findById(id);
@@ -318,26 +333,26 @@ export const getPersonStats = async (req, res, next) => {
     const [directorStats, castStats] = await Promise.all([
       Entity.aggregate([
         { $match: { directors: person._id } },
-        { 
-          $group: { 
+        {
+          $group: {
             _id: null,
             totalEntities: { $sum: 1 },
             avgRating: { $avg: "$rating" },
-            genres: { $push: "$genres" }
-          }
-        }
+            genres: { $push: "$genres" },
+          },
+        },
       ]),
       Entity.aggregate([
         { $match: { cast: person._id } },
-        { 
-          $group: { 
+        {
+          $group: {
             _id: null,
             totalEntities: { $sum: 1 },
             avgRating: { $avg: "$rating" },
-            genres: { $push: "$genres" }
-          }
-        }
-      ])
+            genres: { $push: "$genres" },
+          },
+        },
+      ]),
     ]);
 
     res.json({
@@ -345,12 +360,16 @@ export const getPersonStats = async (req, res, next) => {
       person: {
         _id: person._id,
         name: person.name,
-        roles: person.roles
+        roles: person.roles,
       },
       stats: {
-        asDirector: directorStats[0] || { totalEntities: 0, avgRating: 0, genres: [] },
-        asCast: castStats[0] || { totalEntities: 0, avgRating: 0, genres: [] }
-      }
+        asDirector: directorStats[0] || {
+          totalEntities: 0,
+          avgRating: 0,
+          genres: [],
+        },
+        asCast: castStats[0] || { totalEntities: 0, avgRating: 0, genres: [] },
+      },
     });
   } catch (err) {
     next(err);
