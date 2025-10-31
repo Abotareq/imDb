@@ -1323,3 +1323,304 @@ export default router;
  *               message: "Server error"
  *               error: "Internal server error occurred while updating person with JSON"
  */
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Person:
+ *       type: object
+ *       required:
+ *         - name
+ *         - roles
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Auto-generated MongoDB ID of the person
+ *           example: "66f8b3f4f1234567890abcd1"
+ *         name:
+ *           type: string
+ *           description: Person's full name
+ *           example: "Christopher Nolan"
+ *         bio:
+ *           type: string
+ *           description: Biography of the person
+ *           example: "British-American film director, producer, and screenwriter known for films like Inception and The Dark Knight"
+ *         dateOfBirth:
+ *           type: string
+ *           format: date
+ *           description: Date of birth
+ *           example: "1970-07-30"
+ *         photoUrl:
+ *           type: string
+ *           description: URL of the profile photo
+ *           example: "https://res.cloudinary.com/example/christopher-nolan.jpg"
+ *         roles:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [actor, director, writer]
+ *           description: Roles the person has in the industry
+ *           example: ["director", "writer"]
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the person was created
+ *           example: "2025-01-15T10:00:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the person was last updated
+ *           example: "2025-01-15T10:00:00.000Z"
+ *       example:
+ *         _id: "66f8b3f4f1234567890abcd1"
+ *         name: "Christopher Nolan"
+ *         bio: "British-American film director, producer, and screenwriter known for films like Inception and The Dark Knight"
+ *         dateOfBirth: "1970-07-30"
+ *         photoUrl: "https://res.cloudinary.com/example/christopher-nolan.jpg"
+ *         roles: ["director", "writer"]
+ *         createdAt: "2025-01-15T10:00:00.000Z"
+ *         updatedAt: "2025-01-15T10:00:00.000Z"
+ *
+ *     CreatePersonRequest:
+ *       type: object
+ *       required:
+ *         - name
+ *         - roles
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Person's full name
+ *           example: "Christopher Nolan"
+ *         bio:
+ *           type: string
+ *           description: Biography of the person
+ *           example: "British-American film director, producer, and screenwriter"
+ *         dateOfBirth:
+ *           type: string
+ *           format: date
+ *           description: Date of birth
+ *           example: "1970-07-30"
+ *         roles:
+ *           type: string
+ *           description: JSON string of roles array
+ *           example: '["director", "writer"]'
+ *         photoUrl:
+ *           type: string
+ *           format: binary
+ *           description: Profile photo file (JPG, PNG, WEBP)
+ *       example:
+ *         name: "Christopher Nolan"
+ *         bio: "British-American film director, producer, and screenwriter"
+ *         dateOfBirth: "1970-07-30"
+ *         roles: '["director", "writer"]'
+ *
+ *     UpdatePersonRequest:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Updated full name
+ *           example: "Christopher Nolan Updated"
+ *         bio:
+ *           type: string
+ *           description: Updated biography
+ *           example: "Updated biography for British-American film director"
+ *         dateOfBirth:
+ *           type: string
+ *           format: date
+ *           description: Updated date of birth
+ *           example: "1970-07-30"
+ *         roles:
+ *           type: string
+ *           description: JSON string of updated roles array
+ *           example: '["director", "writer", "actor"]'
+ *         photoUrl:
+ *           type: string
+ *           format: binary
+ *           description: Updated profile photo file (JPG, PNG, WEBP)
+ *       example:
+ *         name: "Christopher Nolan Updated"
+ *         bio: "Updated biography for British-American film director"
+ *         roles: '["director", "writer", "actor"]'
+ *
+ *     PersonEntities:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         person:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "66f8b3f4f1234567890abcd1"
+ *             name:
+ *               type: string
+ *               example: "Christopher Nolan"
+ *             photoUrl:
+ *               type: string
+ *               example: "https://res.cloudinary.com/example/christopher-nolan.jpg"
+ *         movies:
+ *           type: object
+ *           properties:
+ *             asDirector:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                         example: "Inception"
+ *                       type:
+ *                         type: string
+ *                         example: "movie"
+ *                       posterUrl:
+ *                         type: string
+ *                         example: "https://res.cloudinary.com/example/inception-poster.jpg"
+ *                       releaseDate:
+ *                         type: string
+ *                         format: date
+ *                         example: "2010-07-16"
+ *                       rating:
+ *                         type: number
+ *                         example: 8.8
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     pages:
+ *                       type: integer
+ *                       example: 1
+ *             asCast:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                         example: "Memento"
+ *                       type:
+ *                         type: string
+ *                         example: "movie"
+ *                       posterUrl:
+ *                         type: string
+ *                         example: "https://res.cloudinary.com/example/memento-poster.jpg"
+ *                       releaseDate:
+ *                         type: string
+ *                         format: date
+ *                         example: "2000-09-05"
+ *                       rating:
+ *                         type: number
+ *                         example: 8.4
+ *                 total:
+ *                   type: integer
+ *                   example: 2
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     pages:
+ *                       type: integer
+ *                       example: 1
+ *
+ *     PersonStats:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         person:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               example: "66f8b3f4f1234567890abcd1"
+ *             name:
+ *               type: string
+ *               example: "Christopher Nolan"
+ *             roles:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["director", "writer"]
+ *         stats:
+ *           type: object
+ *           properties:
+ *             asDirector:
+ *               type: object
+ *               properties:
+ *                 totalEntities:
+ *                   type: integer
+ *                   example: 5
+ *                 avgRating:
+ *                   type: number
+ *                   example: 8.7
+ *                 genres:
+ *                   type: array
+ *                   items:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Sci-Fi"
+ *                         description:
+ *                           type: string
+ *                           example: "Explores futuristic concepts"
+ *             asCast:
+ *               type: object
+ *               properties:
+ *                 totalEntities:
+ *                   type: integer
+ *                   example: 2
+ *                 avgRating:
+ *                   type: number
+ *                   example: 8.2
+ *                 genres:
+ *                   type: array
+ *                   items:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Thriller"
+ *                         description:
+ *                           type: string
+ *                           example: "Suspenseful storytelling"
+ *
+ *     Error:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         message:
+ *           type: string
+ *           example: "Error message"
+ *         error:
+ *           type: string
+ *           example: "Detailed error information"
+ */
